@@ -42,11 +42,11 @@ export default class SearchBooks extends Component {
 					}));
 				}
 			});
-		} else {
-			this.setState((currentState) => ({
-				Books: currentState.Books,
+		} else if (query.length === 0) {
+			this.setState(() => ({
+				Books: [],
 				searchError: false,
-			}));
+			}))
 		}
 	};
 	shelfChangeHandler = (Books) => {
