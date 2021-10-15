@@ -1,93 +1,84 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import ListBooksView from './list-books-view';
-import * as BooksAPI from './../BooksAPI';
+import React, {useState} from 'react';
+import {Link} from 'react-router-dom';
+import BooksComponent from './books-component';
+import * as booksAPI from './../BooksAPI';
 
 import PropTypes from 'prop-types';
 
-export default class SearchBooks extends Component {
-	static propTypes = {
-		mybooks: PropTypes.array.isRequired,
-		onChange: PropTypes.func.isRequired,
-		
-	};
+function SearchBooks(props) {
 
-	state = {
-		Books: [],
-		query: '',
-		searchError: false,
-	};
+    const [books, setBooks] = useState([])
+    const [query, setQuery] = useState('')
+    const [searchError, setSearchError] = useState(false)
 
-	searchHandler = (e) => {
-		let query = e.target.value;
-		this.setState(() => {
-			return { query: query };
-		});
-		this.searchUpdateHandler(query);
-	};
+    function searchBooksHandler(event) {
+        let queryString = event.target.value;
+        setQuery(queryString)
+        searchBooksUpdateHandler(queryString);
+    };
 
-	searchUpdateHandler = query => {
-		if (query) {
-			BooksAPI.search(query).then((Books) => {
-				if (Books.length > 0) {
-					Books = this.shelfChangeHandler(Books);
-					this.setState(() => ({
-						Books: Books,
-						searchError: false,
-					}));
-				} else {
-					this.setState(() => ({
-						Books: [],
-						searchError: true,
-					}));
-				}
-			});
-		} else if (query.length === 0) {
-			this.setState(() => ({
-				Books: [],
-				searchError: false,
-			}))
-		}
-	};
-	shelfChangeHandler = (Books) => {
-		let mybooks = this.props.mybooks;
+    function searchBooksUpdateHandler(searchQuery) {
+        if (searchQuery) {
+            booksAPI.search(searchQuery).then((searchedBooks) => {
+                if (searchedBooks.length > 0) {
+                    let updatedSearchedBooks = shelfContentHandler(searchedBooks);
+                    setBooks(updatedSearchedBooks)
+                    setSearchError(false)
+                } else {
+                    setBooks([])
+                    setSearchError(true)
+                }
+            });
+        } else if (searchQuery === "") {
+            setBooks([])
+            setSearchError(false)
+        }
+    };
 
-		Books.forEach((book) => {
-			book.shelf = 'none';
-			mybooks.forEach((myBook) => {
-				if (myBook.id === book.id) {
-					book.shelf = myBook.shelf;
-				}
-			});
-		});
-		return Books;
-	};
+    function shelfContentHandler(shelfbooks) {
+        let mybooks = props.mybooks;
 
-	render() {
-		const { Books, searchError } = this.state;
-		return (
-			<div className='search-books'>
-				<div className='search-books-bar'>
-					<Link to='/' className='close-search'>
-						Close
-					</Link>
-					<div className='search-books-input-wrapper'>
-						<input autoFocus type='text' placeholder='Search books by title or author' value={this.state.query} onChange={this.searchHandler} />
-					</div>
-				</div>
-				<div className='search-books-results'>
-					{Books.length > 0 && (
-						<div>
-							<ol className='books-grid'>
-								{Books.map((book) => (
-									<ListBooksView key={book.id} book={book} shelfClickHandler={this.props.onChange} />
-								))}
-							</ol>
-						</div>
-					)}
-					{searchError && <div> No Books Available </div>}
-				</div>
-			</div>
-		);
-	}
+        shelfbooks.forEach((book) => {
+            book.shelf = 'none';
+            mybooks.forEach((myShelfBook) => {
+                if (myShelfBook.id === book.id) {
+                    book.shelf = myShelfBook.shelf;
+                }
+            });
+        });
+        return shelfbooks;
+    };
+
+    return (
+        <div className='search-books'>
+            <div className='search-books-bar'>
+                <Link to='/' className='close-search'>
+                    Close
+                </Link>
+                <div className='search-books-input-wrapper'>
+                    <input autoFocus type='text' placeholder='Search books by title or author' value={query}
+                           onChange={searchBooksHandler}/>
+                </div>
+            </div>
+            <div className='search-books-results'>
+                {books.length > 0 && (
+                    <div>
+                        <ol className='books-grid'>
+                            {books.map((book) => (
+                                <BooksComponent key={book.id} book={book} shelfHandler={props.onChange}/>
+                            ))}
+                        </ol>
+                    </div>
+                )}
+                {searchError && <div> No Books Available </div>}
+            </div>
+        </div>
+    );
 }
+
+SearchBooks.propTypes = {
+    mybooks: PropTypes.array.isRequired,
+    onChange: PropTypes.func.isRequired,
+};
+
+export default SearchBooks;

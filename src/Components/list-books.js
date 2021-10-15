@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 
-import ListBooksView from './list-books-view';
+import BooksComponent from './books-component';
 
 function ListBooks(props) {
 
@@ -11,14 +11,14 @@ function ListBooks(props) {
 	const filterToRead = books.filter(book => book.shelf === 'wantToRead');
 	const filterPresentRead = books.filter(book => book.shelf === 'read');
 
-	const booksHandler = (books, head) => {
+	function booksHandler (books, head){
 		return (
 			<div className='bookshelf'>
 				<h2 className='bookshelf-title'>{head}</h2>
 				<div className='bookshelf-books'>
 					<ol className='books-grid'>
 						{books.map(book => (
-							<ListBooksView key={book.id} book={book} shelfClickHandler={onChange}/>
+							<BooksComponent key={book.id} book={book} shelfHandler={onChange}/>
 						))}
 					</ol>
 				</div>
@@ -34,13 +34,13 @@ function ListBooks(props) {
 			<div className='list-books-content'>
 				<div>
 					{booksHandler(filterCurrentBook, 'Currently Reading Books')}
-					{booksHandler(filterToRead, 'Want to Read Books')}
+					{booksHandler(filterToRead, 'Books To Be Read')}
 					{booksHandler(filterPresentRead, 'Read Books')}
 				</div>
 			</div>
 
 			<div className='open-search'>
-				<Link to='/search'>Add a book</Link>
+				<Link to='/search'>Add Book</Link>
 			</div>
 		</div>
 	)

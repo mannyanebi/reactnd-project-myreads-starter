@@ -2,11 +2,11 @@ import React from "react";
 
 import PropTypes from "prop-types";
 
-function ListBooksView(props) {
-	const {shelfClickHandler, book} = props
+function BooksComponent(props) {
+	const {shelfHandler, book} = props
 
-	const shelfUpdateHandler = e => {
-		shelfClickHandler(book, e.target.value);
+	const shelfContentHandler = e => {
+		shelfHandler(book, e.target.value);
 	};
 
 	const image = book.imageLinks ? book.imageLinks.thumbnail : null;
@@ -25,12 +25,12 @@ function ListBooksView(props) {
 							}}
 						></div>
 						<div className="book-shelf-changer">
-							<select onChange={shelfUpdateHandler} value={props.book.shelf}>
+							<select onChange={shelfContentHandler} value={book.shelf}>
 								<option value="move" disabled>
 									Move to...
 								</option>
 								<option value="currentlyReading">Currently Reading</option>
-								<option value="wantToRead">Want to Read</option>
+								<option value="toRead">To Read</option>
 								<option value="read">Read</option>
 								<option value="none">None</option>
 							</select>
@@ -44,8 +44,8 @@ function ListBooksView(props) {
 	);
 }
 
-ListBooksView.propTypes = {
-	shelfClickHandler: PropTypes.func.isRequired,
+BooksComponent.propTypes = {
+	shelfHandler: PropTypes.func.isRequired,
 };
 
-export default ListBooksView;
+export default BooksComponent;
